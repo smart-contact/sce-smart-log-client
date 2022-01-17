@@ -1,10 +1,26 @@
 <?php
 
-namespace Tests;
+namespace SmartContact\SmartLogClient\Tests;
 
-use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use SmartContact\SmartLogClient\SmartLogClientServiceProvider;
 
-abstract class TestCase extends BaseTestCase
+class TestCase extends \Orchestra\Testbench\TestCase
 {
-    use CreatesApplication;
+  public function setUp(): void
+  {
+    parent::setUp();
+    // additional setup
+  }
+
+  protected function getPackageProviders($app)
+  {
+    return [
+      SmartLogClientServiceProvider::class,
+    ];
+  }
+
+  protected function getEnvironmentSetUp($app)
+  {
+    // perform environment setup
+  }
 }
