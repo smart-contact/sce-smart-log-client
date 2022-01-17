@@ -1,5 +1,6 @@
 {
     "name": "smart-contact/smart-log-client",
+    "type": "library",
     "require": {
         "illuminate/support": "^8.79"
     },
