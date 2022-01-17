@@ -23,6 +23,13 @@
         }
     },
 
+
+    "autoload-dev": {
+        "psr-4": {
+            "SmartContact\\SmartLogClient\\Tests\\": "tests"
+        }
+    },
+
     "extra": {
         "laravel": {
             "providers": [
