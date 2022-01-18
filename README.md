@@ -54,16 +54,3 @@ Es. slack, teams ecc
 Per rendere "loggabili" anche le eccezioni modificare il file `app/Exceptions/Handler.php`.
 
 Bisogna estendere la classe `SmartContact\SmartLogClient\Exceptions\SmartLogClientException`
-
-
-## SmartLogClient Facade
-
-### `SmartLogClient::log(string $message, string $level = debug)`
-### `SmartLogClient::debug(string $message)`
-### `SmartLogClient::info(string $message)`
-### `SmartLogClient::notice(string $message)`
-### `SmartLogClient::warning(string $message)`
-### `SmartLogClient::error(string $message)`
-### `SmartLogClient::critical(string $message)`
-### `SmartLogClient::alert(string $message)`
-### `SmartLogClient::emergency(string $message)`
