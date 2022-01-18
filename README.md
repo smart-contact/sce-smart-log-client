@@ -1,14 +1,5 @@
 # Smart Log Client
 Smart Log Client è un package Laravel che mette in comunicazione il sistema SmartLog per monitorare e analizzare eventuali log.
-Il client permette la registrazione di vari "livelli" di log come: 
-- `DEBUG`
-- `INFO`
-- `NOTICE`
-- `WARNING`
-- `ERROR`
-- `CRITICAL`
-- `ALERT`
-- `EMERGENCY`
 
 
 
@@ -43,7 +34,6 @@ Il client necessita delle seguenti configurazioni:
     SMARTLOG_APP_ID="Live Landing"
     SMARTLOG_LEVEL=alert
     SMARTLOG_NOTIFICATION_SERVICE=slack
-    SMARTLOG_NOTIFICATION_LEVEL=error
 ```
 
 ### SMARTLOG_API_URL
@@ -59,11 +49,11 @@ Livello da utilizzare per i log da catturare.
 Servizio di notifica, se vuoto non viene incluso.
 Es. slack, teams ecc
 
-### SMARTLOG_NOTIFICATION_LEVEL 
-> Gestione differente? default = SMARTLOG_LEVEL
-
 
 ## ExceptionHandler
+Per rendere "loggabili" anche le eccezioni modificare il file `app/Exceptions/Handler.php`.
+
+Bisogna estendere la classe `SmartContact\SmartLogClient\Exceptions\SmartLogClientException`
 
 
 ## SmartLogClient Facade
