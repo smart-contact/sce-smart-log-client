@@ -50,13 +50,18 @@ Il client necessita delle seguenti configurazioni:
 Indica il dominio di smartlog a cui inviare i dati
 
 ### SMARTLOG_APP_ID
+Id univoco dell'applicazione "host" (Es. Live Landing, Ocm, ecc)
 
 ### SMARTLOG_LEVEL
+Livello da utilizzare per i log da catturare.
 
 ### SMARTLOG_NOTIFICATION_SERVICE
+Servizio di notifica, se vuoto non viene incluso.
+Es. slack, teams ecc
 
-### SMARTLOG_NOTIFICATION_LEVEL
-### SMARTLOG_LEVEL_
+### SMARTLOG_NOTIFICATION_LEVEL 
+> Gestione differente? default = SMARTLOG_LEVEL
+
 
 ## ExceptionHandler
 
