@@ -1,14 +1,14 @@
 # Smart Log Client
 Smart Log Client è un package Laravel che mette in comunicazione il sistema SmartLog per monitorare e analizzare eventuali log.
 Il client permette la registrazione di vari "livelli" di log come: 
-    - `DEBUG`
-    - `INFO`
-    - `NOTICE`
-    - `WARNING`
-    - `ERROR`
-    - `CRITICAL`
-    - `ALERT`
-    - `EMERGENCY`
+- `DEBUG`
+- `INFO`
+- `NOTICE`
+- `WARNING`
+- `ERROR`
+- `CRITICAL`
+- `ALERT`
+- `EMERGENCY`
 
 
 
