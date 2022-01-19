@@ -15,14 +15,19 @@ class SmartLogHandler extends AbstractProcessingHandler{
 
     protected function write(array $record): void
     {
+
+        $exception = $record['context']['exception'];
         //process here the monolog record
         $this->smartlogClient->sendLog([
             'message' => $record['message'],
-            'error' => [
-                'code' => $record['context']['exception']->getCode(),
-                'type' => $record['level_name']
-            ],
-            'traceFormatted' => $record['context']['exception']->getTraceAsString()
+            'status_code' => $exception->getCode(),
+            'level_name' => $record['level_name'],
+            'level_code' => $record['level'],
+            'referer' => request()->headers->get('referer'),
+            'ip' => request()->ip(),
+            'context' => $record['context'],
+            'user' => auth()->user()?->id,
+            'formatted' => $exception->getTraceAsString()
         ]);
     }
 }
