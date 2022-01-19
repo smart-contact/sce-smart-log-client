@@ -8,16 +8,11 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 
 class SmartLogClient {
-    protected $client;
     protected $application;
-
-    public function __construct()
+    
+    public function __construct(protected Client $client, protected $applicationName)
     {
-        $this->client = new Client([
-            'base_uri' => env('SMARTLOG_API_URL')
-        ]);
-
-        $this->application = $this->getApp(env('SMARTLOG_APP_ID'));
+        $this->application = $this->getApp($applicationName);
     }
 
     /**

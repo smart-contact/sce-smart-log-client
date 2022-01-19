@@ -3,6 +3,7 @@
 namespace SmartContact\SmartLogClient;
 
 use Illuminate\Support\ServiceProvider;
+use GuzzleHttp\Client;
 use SmartContact\SmartLogClient\SmartLogClient;
 
 class SmartLogClientServiceProvider extends ServiceProvider
@@ -15,7 +16,14 @@ class SmartLogClientServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(__DIR__.'/../config/logging.php', 'logging');
-        $this->app->singleton(SmartLogClient::class, fn() => new SmartLogClient);
+        $this->app->singleton(SmartLogClient::class, function(){
+            $httpClient = new Client([
+                'base_uri' => env('SMARTLOG_API_URL')
+            ]);
+            
+            $applicationName = env('SMARTLOG_APP_ID');
+            return new SmartLogClient($httpClient, $applicationName);
+        });
     }
 
     /**
