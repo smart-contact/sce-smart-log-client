@@ -23,10 +23,7 @@ class SmartLogHandler extends AbstractProcessingHandler{
             'status_code' => $exception->getCode(),
             'level_name' => $record['level_name'],
             'level_code' => $record['level'],
-            'referer' => request()->headers->get('referer'),
-            'ip' => request()->ip(),
             'context' => $record['context'],
-            'user' => auth()->user()?->id,
             'formatted' => $exception->getTraceAsString()
         ]);
     }
