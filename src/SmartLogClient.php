@@ -61,7 +61,7 @@ class SmartLogClient {
      */
     public function sendLog(array $log)
     {
-        $log['id'] = $this->generateLogUID();
+        $log['incident_code'] = $this->generateLogUID();
 
         // $log = [
         //     'id' => $this->generateLogUID(),
