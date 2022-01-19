@@ -10,36 +10,55 @@ use GuzzleHttp\Exception\ClientException;
 class SmartLogClient {
     protected $application;
     
-    public function __construct(protected Client $client, protected $applicationName)
+    public function __construct(protected Client $client, protected string $applicationName)
     {
-        $this->application = $this->getApp($applicationName);
+        $this->application = $this->loadApplication($applicationName);
     }
 
     /**
-     * Return the application
+     * Return the application data from smart-bridge app.
      *
      * @param string $name
      * @return object
      */
-    protected function getApp(string $name): object
+    protected function loadApplication(string $name)
     {
         try{
-            // return $this->client->get("/apps?name={$name}")->getBody();
-            return (object) [
-                'id' => 1,
-                'name' => 'Test App',
-                'slug' => 'test-app',
-                'shortName' => 'TA'
-            ];
+            $res = $this->client->get("/apps?name={$name}");
+            return json_decode($res->getBody());
         }
         catch(ClientException $e){
-            Log::emergency(
-                "[smart-log-client error]: cannot create or get the application with name \"{$name}\".",
-                [
-                    'exception' => $e,
-                ]
-            );
+            if($e->getCode() === 404){
+                return $this->createApplication($name);
+            }
+
+            throw $e;
         }
+    }
+
+    /**
+     * Creates a new application to smart-bridge-app.
+     *
+     * @param string $name
+     * @return object
+     */
+    public function createApplication(string $name)
+    {
+        $res = $this->client->post('/apps', [
+            'name' => $name
+        ]);
+
+        return json_decode($res->getBody());   
+    }
+
+    /**
+     * get the application object
+     *
+     * @return object
+     */
+    public function getApplication(): object
+    {
+        return $this->application;
     }
 
     /**
@@ -62,6 +81,9 @@ class SmartLogClient {
     public function sendLog(array $log)
     {
         $log['incident_code'] = $this->generateLogUID();
+        $log['referer'] = request()->headers->get('referer');
+        $log['ip'] = request()->ip();
+        $log['user'] = auth()->user()?->id;
 
         // $log = [
         //     'id' => $this->generateLogUID(),
