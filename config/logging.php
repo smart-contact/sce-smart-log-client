@@ -1,24 +1,21 @@
 <?php
 
 return [
-    'test' => 1,
     'channels' => [
         'smartlog-stack' => [
             'driver' => 'stack',
-            'channels' => ['single', 'smartlog'],
+            'channels' => [
+                'single',
+                'smartlog',
+                config('smartlog.notificationChannel') || null
+            ],
             'ignore_exceptions' => false
         ],
 
         'smartlog' => [
             'driver' => 'monolog',
             'handler' => \SmartContact\SmartLogClient\LogHandlers\SmartLogHandler::class,
-            'level' => 'emergency'
+            'level' => config('smartlog.logLevel')
         ]
-
-        // 'smartlog' => [
-        //     'driver' => 'custom',
-        //     'via' => \SmartContact\SmartLogClient\SmartLogChannel::class,
-        //     'level' => 'emergency'
-        // ]
     ]
 ];
