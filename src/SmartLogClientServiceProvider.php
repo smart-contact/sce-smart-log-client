@@ -16,12 +16,16 @@ class SmartLogClientServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(__DIR__.'/../config/logging.php', 'logging');
+        $this->publishes([
+            __DIR__.'/../config/smartlog.php' => config_path('smartlog.php')
+        ]);
+
         $this->app->singleton(SmartLogClient::class, function(){
             $httpClient = new Client([
-                'base_uri' => env('SMARTLOG_API_URL')
+                'base_uri' => config('smartlog.apiURL')
             ]);
             
-            $applicationName = env('SMARTLOG_APP_ID');
+            $applicationName = config('smartlog.applicationName');
             return new SmartLogClient($httpClient, $applicationName);
         });
     }
