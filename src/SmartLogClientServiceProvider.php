@@ -36,7 +36,7 @@ class SmartLogClientServiceProvider extends ServiceProvider
         if($this->app->runningInConsole()){
             $this->publishes([
                 __DIR__.'/../config/smartlog.php' => config_path('smartlog.php')
-            ], 'smartlog-configs');
+            ], 'smartlog-client-config');
         }
     }
 }
