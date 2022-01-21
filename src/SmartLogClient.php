@@ -45,7 +45,7 @@ class SmartLogClient {
     public function createApplication(string $name)
     {
         $res = $this->client->post('/apps', [
-            'name' => $name
+            'body' => json_encode(['name' => $name])
         ]);
 
         return json_decode($res->getBody());   
@@ -81,23 +81,11 @@ class SmartLogClient {
     public function sendLog(array $log)
     {
         $log['incident_code'] = $this->generateLogUID();
-        $log['referer'] = request()->headers->get('referer');
-        $log['ip'] = request()->ip();
-        $log['user'] = auth()->user()?->id;
-
-        // $log = [
-        //     'id' => $this->generateLogUID(),
-        //     'message' => $message,
-        // ];
 
         try{
-            // $res = $this->client->post("/apps/{$this->application->slug}/logs", [
-            //     'json' => $log
-            // ]);
-
-            ddd($log);
-
-            //handle no 200 responses
+            $this->client->post("/apps/{$this->application->slug}/logs", [
+                'body' => json_encode($log)
+            ]);
         }
         catch(ClientException $e){
             Log::emergency(
@@ -107,6 +95,8 @@ class SmartLogClient {
                     'log' => $log
                 ]
             );
+
+            throw $e;
         }
     }
 }
