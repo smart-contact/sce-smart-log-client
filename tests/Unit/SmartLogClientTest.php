@@ -2,16 +2,14 @@
 
 namespace SmartContact\SmartLogClient\Tests\Unit;
 
-use Mockery;
+use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Client;
 use GuzzleHttp\Middleware;
-use Illuminate\Support\Str;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Exception\ServerException;
 use SmartContact\SmartLogClient\SmartLogClient;
-use SmartContact\SmartLogClient\Tests\TestCase;
 
 class SmartLogClientTest extends TestCase
 {
@@ -30,11 +28,6 @@ class SmartLogClientTest extends TestCase
       ];
 
       $this->clientHttp = $this->createClientHttp();
-   }
-
-   public function tearDown():void
-   {
-      Mockery::close();
    }
 
    /**
