@@ -19,6 +19,9 @@ class SmartLogHandler extends AbstractProcessingHandler{
         $exception = $record['context']['exception'];
         //process here the monolog record
         $this->smartlogClient->sendLog([
+            'referer' => request()->headers->get('referer'),
+            'ip' => request()->ip(),
+            'user' => auth()->user()?->id,
             'message' => $record['message'],
             'status_code' => $exception->getCode(),
             'level_name' => $record['level_name'],
