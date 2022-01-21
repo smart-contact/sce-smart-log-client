@@ -2,23 +2,39 @@
 
 namespace SmartContact\SmartLogClient\Tests\Unit;
 
-use SmartContact\SmartLogClient\Tests\TestCase;
+use Mockery;
 use GuzzleHttp\Client;
-use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\Middleware;
+use Illuminate\Support\Str;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\Exception\ServerException;
 use SmartContact\SmartLogClient\SmartLogClient;
+use SmartContact\SmartLogClient\Tests\TestCase;
 
 class SmartLogClientTest extends TestCase
 {
    protected $clientHttp;
-   protected $clientHttpMocks;
+   protected $httpResponseMocks;
+   protected $httpTransactions;
+   protected $fakeApplication;
 
    function setUp():void
    {
+      $this->fakeApplication = [
+         'id' => 1,
+         'name' => 'testing app', 
+         'slug' => 'testing-app',
+         'shortName' => 'TA'
+      ];
+
       $this->clientHttp = $this->createClientHttp();
+   }
+
+   public function tearDown():void
+   {
+      Mockery::close();
    }
 
    /**
@@ -28,52 +44,113 @@ class SmartLogClientTest extends TestCase
     */
    private function createClientHttp():Client
    {
-      $this->clientHttpMocks = new MockHandler([]);
+      $this->httpTransactions = [];
+      $history = Middleware::history($this->httpTransactions);
+
+      $this->httpResponseMocks = new MockHandler([]);
+      $handlerStack = HandlerStack::create($this->httpResponseMocks);
+      $handlerStack->push($history);
 
       return new Client([
-         'handler' => HandlerStack::create($this->clientHttpMocks)
+         'handler' => $handlerStack
       ]);
    }
 
-   public function testItShouldLoadAnApplicationData()
+   /** @test */
+   public function itShouldLoadAnApplicationData()
    {
-      $expected = [
-         'id' => 1,
-         'name' => 'testing app', 
-         'slug' => 'testing-app',
-         'shortName' => 'TA'
-      ];
-
-      $this->clientHttpMocks->append(
-         new Response(200, ['Content-Type' => 'application/json'], json_encode($expected))
+      $this->httpResponseMocks->append(
+         new Response(200, ['Content-Type' => 'application/json'], json_encode($this->fakeApplication))
       );
 
       $smartLogClient = new SmartLogClient($this->clientHttp, 'testing app');
-      $this->assertEquals($smartLogClient->getApplication(), (object) $expected);
+
+
+      // check the request
+      $this->assertCount(1, $this->httpTransactions);
+      $requestURLQuery = $this->httpTransactions[0]['request']->getUri()->getQuery();
+      $expectedURLQuery = 'name='. rawurlencode($this->fakeApplication['name']);
+      $this->assertStringContainsString($expectedURLQuery, $requestURLQuery);
+
+      //check the response
+      $this->assertEquals($smartLogClient->getApplication(), (object) $this->fakeApplication);
    }
 
-   public function testItShouldCreateAnApplicationAndReturnItsData()
+   /** @test */
+   public function itShouldCreateAnApplicationAndReturnItsData()
    {
-      $expected = [
-         'id' => 1,
-         'name' => 'testing app', 
-         'slug' => 'testing-app',
-         'shortName' => 'TA'
-      ];
-
       //First call, should a 404 code
-      $this->clientHttpMocks->append(
+      $this->httpResponseMocks->append(
          new Response(404, ['Content-Type' => 'application/json'], json_encode(['message' => 'Application not found.']))
       );
 
       //Secocon call, should return the created app.
-      $this->clientHttpMocks->append(
-         new Response(200, ['Content-Type' => 'application/json'], json_encode($expected))
+      $this->httpResponseMocks->append(
+         new Response(200, ['Content-Type' => 'application/json'], json_encode($this->fakeApplication))
       );
 
       $smartLogClient = new SmartLogClient($this->clientHttp, 'testing app');
-      $this->assertEquals($smartLogClient->getApplication(), (object) $expected);
+
+      //check only post request (ensure that name was given)
+      $this->assertCount(2, $this->httpTransactions);
+      $this->assertEquals($this->httpTransactions[1]['request']->getMethod(), 'POST');
+      $requestBody = json_decode($this->httpTransactions[1]['request']->getBody());
+      $this->assertObjectHasAttribute('name', $requestBody);
+      $this->assertEquals($requestBody->name, ((object) $this->fakeApplication)->name);
+
+
+      $this->assertEquals($smartLogClient->getApplication(), (object) $this->fakeApplication);
    }
 
-   
+   /** @test */
+   public function itThrowsAnExceptionIfCannotCreateOrGetApplicationInfos()
+   {
+      $this->expectException(ServerException::class);
+
+      //First call, should a 404 code
+      $this->httpResponseMocks->append(
+         new Response(404, ['Content-Type' => 'application/json'], json_encode(['message' => 'Application not found.']))
+      );
+
+      //Secocon call, should return the created app.
+      $this->httpResponseMocks->append(
+         new Response(500, ['Content-Type' => 'application/json'], json_encode(['message' => 'Server Error']))
+      );
+
+      new SmartLogClient($this->clientHttp, 'testing app');
+   }
+
+   /** @test */
+   public function shouldPassAsBodyALogInformations()
+   {
+      // GET api/v1/apps?name=testing app
+      $this->httpResponseMocks->append(
+         new Response(200, ['Content-Type' => 'application/json'], json_encode($this->fakeApplication))
+      );
+
+      // POST api/v1/apps/testing-app/logs
+      $this->httpResponseMocks->append(
+         new Response(201, ['Content-Type' => 'application/json'], json_encode(['message' => 'Log inserted']))
+      );
+
+      $fakeLog = [
+         'message' => "I'm a nice log"
+      ];
+
+      $smartLogClient = new SmartLogClient($this->clientHttp, 'testing app');
+      $smartLogClient->sendLog($fakeLog);
+
+      $this->assertCount(2, $this->httpTransactions);
+
+      $request = $this->httpTransactions[1]['request'];
+      $this->assertEquals($request->getMethod(), 'POST');
+      
+      $requestBody = json_decode($request->getBody());
+      $this->assertNotNull($requestBody->incident_code);
+
+      //remove the incident code to test the rest of body
+      unset($requestBody->incident_code);
+      $this->assertEquals($requestBody, (object)$fakeLog);
+
+   }
 }
