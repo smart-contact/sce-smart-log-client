@@ -1,6 +1,7 @@
 {
     "name": "smart-contact/sce-smart-log-client",
     "type": "library",
+    "version": "0.0.3",
     "require": {
         "illuminate/support": "^8.80",
         "guzzlehttp/guzzle": "^7.4",
@@ -43,6 +44,5 @@
                 "SmartContact\\SmartLogClient\\SmartLogClientServiceProvider"
             ]
         }
-    },
-    "version": "0.0.2"
+    }
 }
