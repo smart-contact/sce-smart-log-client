@@ -17,14 +17,7 @@ class SmartLogClientException extends Handler
      */
     public function report(Throwable $e)
     {
-        
-        // switch($e->getCode()){
-        //     case LOG::ERROR:
-
-        //         break;
-        // }
-
-        Log::info($e->getMessage(), [
+        Log::critical($e->getMessage(), [
             'exception' => $e
         ]);
     }
