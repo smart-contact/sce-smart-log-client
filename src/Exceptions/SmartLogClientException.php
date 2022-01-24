@@ -2,7 +2,7 @@
 
 namespace SmartContact\SmartLogClient\Exceptions;
 
-use Throwable;
+use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Foundation\Exceptions\Handler;
 
@@ -15,7 +15,7 @@ class SmartLogClientException extends Handler
      * @param Throwable $e
      * @return void
      */
-    public function report(Throwable $e)
+    public function report(Exception $e)
     {
         Log::critical($e->getMessage(), [
             'exception' => $e

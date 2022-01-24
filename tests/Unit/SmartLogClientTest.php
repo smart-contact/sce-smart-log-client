@@ -18,7 +18,7 @@ class SmartLogClientTest extends TestCase
    protected $httpTransactions;
    protected $fakeApplication;
 
-   function setUp():void
+   function setUp()
    {
       $this->fakeApplication = [
          'id' => 1,
@@ -35,7 +35,7 @@ class SmartLogClientTest extends TestCase
     *
     * @return Client
     */
-   private function createClientHttp():Client
+   private function createClientHttp()
    {
       $this->httpTransactions = [];
       $history = Middleware::history($this->httpTransactions);
@@ -47,6 +47,10 @@ class SmartLogClientTest extends TestCase
       return new Client([
          'handler' => $handlerStack
       ]);
+   }
+
+   private function getFakeApplicationAsObject(){
+      return (object) $this->fakeApplication;
    }
 
    /** @test */
@@ -63,10 +67,10 @@ class SmartLogClientTest extends TestCase
       $this->assertCount(1, $this->httpTransactions);
       $requestURLQuery = $this->httpTransactions[0]['request']->getUri()->getQuery();
       $expectedURLQuery = 'name='. rawurlencode($this->fakeApplication['name']);
-      $this->assertStringContainsString($expectedURLQuery, $requestURLQuery);
+      $this->assertContains($expectedURLQuery, $requestURLQuery);
 
       //check the response
-      $this->assertEquals($smartLogClient->getApplication(), (object) $this->fakeApplication);
+      $this->assertEquals($smartLogClient->getApplication(), $this->getFakeApplicationAsObject());
    }
 
    /** @test */
@@ -89,7 +93,7 @@ class SmartLogClientTest extends TestCase
       $this->assertEquals($this->httpTransactions[1]['request']->getMethod(), 'POST');
       $requestBody = json_decode($this->httpTransactions[1]['request']->getBody());
       $this->assertObjectHasAttribute('name', $requestBody);
-      $this->assertEquals($requestBody->name, ((object) $this->fakeApplication)->name);
+      $this->assertEquals($requestBody->name, $this->getFakeApplicationAsObject()->name);
 
 
       $this->assertEquals($smartLogClient->getApplication(), (object) $this->fakeApplication);

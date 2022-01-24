@@ -8,10 +8,12 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 
 class SmartLogClient {
+    protected $client;
     protected $application;
     
-    public function __construct(protected Client $client, protected string $applicationName)
-    {
+    public function __construct(Client $client, $applicationName)
+    {   
+        $this->client = $client;
         $this->application = $this->loadApplication($applicationName);
     }
 
@@ -21,7 +23,7 @@ class SmartLogClient {
      * @param string $name
      * @return object
      */
-    protected function loadApplication(string $name)
+    protected function loadApplication($name)
     {
         try{
             $res = $this->client->get("/apps?name={$name}");
@@ -42,7 +44,7 @@ class SmartLogClient {
      * @param string $name
      * @return object
      */
-    public function createApplication(string $name)
+    public function createApplication($name)
     {
         $res = $this->client->post('/apps', [
             'body' => json_encode(['name' => $name])
@@ -56,7 +58,7 @@ class SmartLogClient {
      *
      * @return object
      */
-    public function getApplication(): object
+    public function getApplication()
     {
         return $this->application;
     }
@@ -66,9 +68,9 @@ class SmartLogClient {
      *
      * @return string
      */
-    protected function generateLogUID(): string
+    protected function generateLogUID()
     {
-        $id = Str::uuid();
+        $id = Str::random(32);
         return "{$this->application->shortName}-{$id}";
     }
 
@@ -78,7 +80,7 @@ class SmartLogClient {
      * @param array $log
      * @return void
      */
-    public function sendLog(array $log)
+    public function sendLog($log)
     {
         $log['incident_code'] = $this->generateLogUID();
 

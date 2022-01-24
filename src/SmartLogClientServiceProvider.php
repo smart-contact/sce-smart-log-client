@@ -18,7 +18,7 @@ class SmartLogClientServiceProvider extends ServiceProvider
 
         $this->app->singleton(SmartLogClient::class, function(){
             $httpClient = new Client([
-                'base_uri' => config('smartlog.apiURL')
+                'base_uri' => config('smartlog.apiBaseURL')
             ]);
             
             $applicationName = config('smartlog.applicationName');
