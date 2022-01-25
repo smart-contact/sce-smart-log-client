@@ -2,7 +2,11 @@
 Smart Log Client è un package Laravel che mette in comunicazione il sistema SmartLog per monitorare e analizzare eventuali log.
 Il pacchetto utilizza la libreria Monolog, già integrata in Laravel.
 
-> ⚠️ Questo pacchetto è compatibile solo con laravel >= 5.6 
+> 
+> Sei nella versione 1.x del pacchetto, le versioni supportate di laravel sono: 
+> 5.6, >6
+>
+> Per le versioni successive [clicca qui]()
 
 
 ## Installazione
