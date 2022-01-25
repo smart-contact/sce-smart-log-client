@@ -1,7 +1,6 @@
 {
     "name": "smart-contact/sce-smart-log-client",
     "type": "library",
-    "version": "1.0.0",
     "require": {
         "illuminate/support": "^5.6|^6.20",
         "guzzlehttp/guzzle": "^6.5|^7.0.1",
