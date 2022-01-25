@@ -101,7 +101,7 @@ Es.
 
 namespace App\Exceptions;
 
-use Throwable;
+use Exception;
 use SmartContact\SmartLogClient\Exceptions\SmartLogClientException;
 
 class Handler extends SmartLogClientException{
