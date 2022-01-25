@@ -1,0 +1,26 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Smartlog 1.x tests
+
+on:
+  push:
+    branches: 1.x
+
+  workflow_dispatch:
+
+jobs:
+  tests-1x:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - uses: php-actions/composer@v5
+      
+      - name: PHPUnit Tests
+        uses: php-actions/phpunit@v2
+        with: 
+          version: 7.5
+          php_version: 5.6
+          configuration: ./phpunit.xml
+          bootstrap: vendor/autoload.php
