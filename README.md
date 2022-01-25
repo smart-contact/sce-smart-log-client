@@ -1,7 +1,10 @@
-# 📃Smart Log Client
+# 📃Smart Log Client v2
 Smart Log Client è un package Laravel che mette in comunicazione il sistema SmartLog per monitorare e analizzare eventuali log.
 Il pacchetto utilizza la libreria Monolog, già integrata in Laravel.
 
+>
+> Questo pacchetto supporta le versioni di laravel >=7.x
+>
 ## Installazione
 ```bash 
 composer require smart-contact/smart-log-client
@@ -17,13 +20,13 @@ Il client necessita delle seguenti variabili env:
 
 ```env
 SMARTLOG_API_URL=https://smartlog.it
-SMARTLOG_APPLICATION_NAME="Live Landing"
+SMARTLOG_APP_NAME="App Name"
 ```
 
 | var | default | description |
 |-----|---------|-------------|
 | SMARTLOG_API_URL | | Indica il dominio di smartlog a cui inviare i dati |
-| SMARTLOG_APPLICATION_NAME | | Nome dell'applicazione in uso. <br>Deve corrispondere al nome presente sull'app Smart Log, se non esiste verrà creata una nuova applicazione con il nome fornito. |
+| SMARTLOG_APP_NAME | | Nome dell'applicazione in uso. <br>Deve corrispondere al nome presente sull'app Smart Log, se non esiste verrà creata una nuova applicazione con il nome fornito. |
 
 ## Configurazione Laravel Logging
 Aggiungere il seguente codice nel file `config/logging.php`
@@ -37,7 +40,7 @@ return [
         'smartlog' => [
             'driver' => 'monolog',
             'handler' => \SmartContact\SmartLogClient\LogHandlers\SmartLogHandler::class,
-            'level' => config('smartlog.logLevel')
+            'level' => config('logging.level')
         ]
     ]
 ];
