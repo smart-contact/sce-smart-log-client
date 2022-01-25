@@ -86,7 +86,7 @@ class SmartLogClient {
 
         try{
             $this->client->post("/apps/{$this->application->slug}/logs", [
-                'json' => json_encode($log)
+                'json' => $log
             ]);
         }
         catch(ClientException $e){
