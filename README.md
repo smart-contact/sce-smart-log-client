@@ -6,7 +6,7 @@ Il pacchetto utilizza la libreria Monolog, già integrata in Laravel.
 > Sei nella versione 1.x del pacchetto, le versioni supportate di laravel sono: 
 > 5.6, >6
 >
-> Per le versioni successive [clicca qui]()
+> Per le versioni successive [clicca qui](https://github.com/smart-contact/sce-smart-log-client/tree/master)
 
 
 ## Installazione
