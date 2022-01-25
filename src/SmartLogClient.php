@@ -45,7 +45,7 @@ class SmartLogClient {
     public function createApplication(string $name)
     {
         $res = $this->client->post('/apps', [
-            'body' => json_encode(['name' => $name])
+            'json' => ['name' => $name]
         ]);
 
         return json_decode($res->getBody());   
@@ -84,7 +84,7 @@ class SmartLogClient {
 
         try{
             $this->client->post("/apps/{$this->application->slug}/logs", [
-                'body' => json_encode($log)
+                'json' => $log
             ]);
         }
         catch(ClientException $e){
