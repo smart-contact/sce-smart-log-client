@@ -21,7 +21,7 @@ class SmartLogHandler extends AbstractProcessingHandler{
         $this->smartlogClient->sendLog([
             'referer' => request()->headers->get('referer'),
             'ip' => request()->ip(),
-            'user' => auth()->user() ? auth()->user()->id : null,
+            'user' => auth()->id(),
             'message' => $record['message'],
             'status_code' => $exception->getCode(),
             'level_name' => $record['level_name'],
