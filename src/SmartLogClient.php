@@ -2,14 +2,18 @@
 
 namespace SmartContact\SmartLogClient;
 
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Log;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
 
-class SmartLogClient {
+class SmartLogClient
+{
     protected $application;
-    
+    const APPLICATIONS_PATH = '/api/applications';
+
+    const JSON_HEADERS = [
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json'
+    ];
+
     public function __construct(protected Client $client, protected string $applicationName)
     {
         $this->application = $this->loadApplication($applicationName);
@@ -23,17 +27,18 @@ class SmartLogClient {
      */
     protected function loadApplication(string $name)
     {
-        try{
-            $res = $this->client->get("/apps?name={$name}");
-            return json_decode($res->getBody());
-        }
-        catch(ClientException $e){
-            if($e->getCode() === 404){
-                return $this->createApplication($name);
-            }
+        $res = $this->client->get(self::APPLICATIONS_PATH . '?name=' . $name, [
+            'headers' => [
+                ...self::JSON_HEADERS
+            ]
+        ]);
 
-            throw $e;
+        $data = json_decode($res->getBody())->data;
+        if (count($data) === 0) {
+            return $this->createApplication($name);
         }
+
+        return $data[0];
     }
 
     /**
@@ -44,11 +49,15 @@ class SmartLogClient {
      */
     public function createApplication(string $name)
     {
-        $res = $this->client->post('/apps', [
+        $res = $this->client->post(self::APPLICATIONS_PATH, [
+            'headers' => [
+                ...self::JSON_HEADERS
+            ],
             'json' => ['name' => $name]
         ]);
 
-        return json_decode($res->getBody());   
+        $data = json_decode($res->getBody())->data;
+        return $data;
     }
 
     /**
@@ -62,17 +71,6 @@ class SmartLogClient {
     }
 
     /**
-     * create a unique id based on the application's short-name
-     *
-     * @return string
-     */
-    protected function generateLogUID(): string
-    {
-        $id = Str::uuid();
-        return "{$this->application->shortName}-{$id}";
-    }
-
-    /**
      * Create a new application's log
      *
      * @param array $log
@@ -80,23 +78,16 @@ class SmartLogClient {
      */
     public function sendLog(array $log)
     {
-        $log['incident_code'] = $this->generateLogUID();
 
-        try{
-            $this->client->post("/apps/{$this->application->slug}/logs", [
-                'json' => $log
-            ]);
-        }
-        catch(ClientException $e){
-            Log::emergency(
-                "[smart-log-client error]: cannot insert log to app \"{$this->application->name}\"",
-                [
-                    'exception' => $e,
-                    'log' => $log
-                ]
-            );
+        $res = $this->client->post(self::APPLICATIONS_PATH . "/{$this->application->slug}/logs", [
+            'headers' => [
+                ...self::JSON_HEADERS
+            ],
+            'json' => $log
+        ]);
 
-            throw $e;
-        }
+        $data = json_decode($res->getBody());
+
+        return $data->incidentId;
     }
 }
