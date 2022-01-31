@@ -2,11 +2,13 @@
 
 namespace SmartContact\SmartLogClient\LogHandlers;
 
+use Illuminate\Support\Facades\URL;
 use Monolog\Logger;
 use Monolog\Handler\AbstractProcessingHandler;
 use SmartContact\SmartLogClient\SmartLogClient;
 
-class SmartLogHandler extends AbstractProcessingHandler{
+class SmartLogHandler extends AbstractProcessingHandler
+{
 
     public function __construct(private SmartLogClient $smartlogClient, $level = Logger::DEBUG, bool $bubble = true)
     {
@@ -16,18 +18,22 @@ class SmartLogHandler extends AbstractProcessingHandler{
     protected function write(array $record): void
     {
 
-        $exception = $record['context']['exception'];
+        $exception = array_key_exists('exception', $record['context']) ? $record['context']['exception'] : null;
+        if ($exception) {
+            unset($record['context']['exception']);
+        }
+
         //process here the monolog record
         $this->smartlogClient->sendLog([
-            'referer' => request()->headers->get('referer'),
+            'referer' => URL::current(),
             'ip' => request()->ip(),
             'user' => auth()->id(),
             'message' => $record['message'],
-            'status_code' => $exception->getCode(),
+            'status_code' => $exception ? $exception->getCode() : 0,
             'level_name' => $record['level_name'],
             'level_code' => $record['level'],
-            'context' => $record['context'],
-            'formatted' => $exception->getTraceAsString()
+            'context' => count($record['context']) !== 0 ? json_encode($record['context']) : null,
+            'formatted' => $exception ? $exception->getTraceAsString() : $record['formatted']
         ]);
     }
 }
