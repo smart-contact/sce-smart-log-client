@@ -2,9 +2,7 @@
 
 namespace SmartContact\SmartLogClient;
 
-use Illuminate\Support\Facades\Log;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
 
 class SmartLogClient
 {
@@ -29,23 +27,18 @@ class SmartLogClient
      */
     protected function loadApplication(string $name)
     {
+        $res = $this->client->get(self::APPLICATIONS_PATH . '?name=' . $name, [
+            'headers' => [
+                ...self::JSON_HEADERS
+            ]
+        ]);
 
-        try {
-            $res = $this->client->get(self::APPLICATIONS_PATH . '?name=' . $name, [
-                'headers' => [
-                    ...self::JSON_HEADERS
-                ]
-            ]);
-
-            $data = json_decode($res->getBody())->data;
-            if (count($data) === 0) {
-                return $this->createApplication($name);
-            }
-
-            return $data[0];
-        } catch (ClientException $e) {
-            throw $e;
+        $data = json_decode($res->getBody())->data;
+        if (count($data) === 0) {
+            return $this->createApplication($name);
         }
+
+        return $data[0];
     }
 
     /**
